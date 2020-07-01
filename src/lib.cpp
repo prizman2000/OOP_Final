@@ -14,7 +14,7 @@ unsigned int Armor::getDamage() {
     return damage;
 }
 
-unsigned int Armor::getPeotection() {
+unsigned int Armor::getProtection() {
     return protection;
 }
 
@@ -32,7 +32,7 @@ void Equipment::info() {
     std::cout << "---------------------------------------------------\n";
     for (int i = 0; i < equipment.size(); i++) {
         std::cout << equipment[i].getName() << "\nУрон: +" << equipment[i].getDamage() << "\nБроня: +"
-                  << equipment[i].getPeotection() << std::endl;
+                  << equipment[i].getProtection() << std::endl;
         std::cout << "*_________*_________*\n";
     }
 }
@@ -40,7 +40,7 @@ void Equipment::info() {
 unsigned int Equipment::returnArmor() {
     unsigned int result = 0;
     for (int i = 0; i < equipment.size(); i++) {
-        result += equipment[i].getPeotection();
+        result += equipment[i].getProtection();
     }
     return result;
 }
@@ -281,7 +281,7 @@ void Arena::getReward() {
         std::cout << "Вы получили награду!\n";
         std::cout << "---------------------------------------------------\n";
         std::cout << reward->getName() << std::endl;
-        std::cout << "Броня: +" << reward->getPeotection() << std::endl;
+        std::cout << "Броня: +" << reward->getProtection() << std::endl;
         std::cout << "Урон: +" << reward->getDamage() << std::endl;
         std::cout << "---------------------------------------------------\n";
         hero->getArenaPoint();
@@ -308,6 +308,16 @@ void InfectedHero::hitHero(Hero &hero) {
 void InfectedHero::info() {
     std::cout << "---------------------------------------------------\n";
     std::cout << "Здоровье инфецированного героя: " << infectedHero->getHp() << std::endl;
+    std::cout << "---------------------------------------------------\n";
+}
+
+Kisoklass::Kisoklass() {
+    auto fireball1 = new Spell;
+}
+
+void Kisoklass::say() {
+    std::cout << "---------------------------------------------------\n";
+    std::cout<<"Mew...Mew...Mew...Mew...Mew...Mew...Mew...Mew...Mew...";
     std::cout << "---------------------------------------------------\n";
 }
 

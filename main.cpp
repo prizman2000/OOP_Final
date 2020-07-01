@@ -74,6 +74,5 @@ hero.hit(&infectedHero);
 
 arena.info();*/
 
-
     return 0;
 }

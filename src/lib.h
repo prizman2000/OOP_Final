@@ -20,6 +20,8 @@ class BossSpider;
 
 class InfectedHero;
 
+class Kisoklass;
+
 
 class Armor {
 private:
@@ -33,7 +35,7 @@ public:
 
     unsigned int getDamage();
 
-    unsigned int getPeotection();
+    unsigned int getProtection();
 };
 
 class Equipment {
@@ -188,5 +190,13 @@ public:
     void info();
 
     void getReward();
+};
+
+class Kisoklass{
+private:
+    Spell spell;
+public:
+    Kisoklass();
+    void say();
 };
 
