@@ -57,18 +57,6 @@ void Equipment::clearEquipment() {
     equipment.clear();
 }
 
-std::string Spell::getName() {
-    return name;
-}
-
-unsigned int Spell::getLvl() {
-    return lvl;
-}
-
-unsigned int Spell::getDamage() {
-    return damage;
-}
-
 unsigned int Spell::getManaCost() {
     return manaCost;
 }
@@ -79,7 +67,7 @@ unsigned int Spell::cast() {
 
 void Spell::lvlUp() {
     ++lvl;
-    damage += lvl * 8;
+    damage += lvl * 4;
 }
 
 void Spell::lvlDown() {
@@ -103,8 +91,20 @@ Hero::Hero(const std::string name, Equipment *equipment, Spell *spell) {
     this->spell = spell;
 }
 
+unsigned int Hero::getHp() {
+    return this->hp;
+}
+
+unsigned int Hero::getDamage() {
+    return this->damage;
+}
+
 unsigned int Hero::getArmor() {
     return this->protection;
+}
+
+void Hero::getArenaPoint() {
+    arenaPoinnt++;
 }
 
 void Hero::refresh() {
@@ -142,27 +142,30 @@ void Hero::infoEquipment() {
 
 void Hero::infoSpell() {
     spell->info();
+    std::cout << "---------------------------------------------------\n";
+    std::cout << "Осталось неиспользованных очков арены: "<<arenaPoinnt<<std::endl;
+    std::cout << "---------------------------------------------------\n";
 }
 
-void Hero::castSpell(Spider &monster) {
+void Hero::castSpell(Monster *monster) {
     if (mana < spell->getManaCost()) {
         std::cout << "---------------------------------------------------\n";
         std::cout << "Недостаточно маны для использования способности!\n";
         std::cout << "---------------------------------------------------\n";
     } else {
-        monster.getDamage(spell->cast());
+        monster->getDamage(spell->cast());
         mana -= spell->getManaCost();
     }
 }
 
-void Hero::hit(Spider &monster) {
-    monster.getDamage(damage);
-    if(mana+10<100){
+void Hero::hit(Monster *monster) {
+    monster->getDamage(damage);
+    if (mana + 10 < 100) {
         mana += 10;
-    }else if(mana+10 >= 100){
+    } else if (mana + 10 >= 100) {
         mana = 100;
     }
-    monster.hitHero(*this);
+    monster->hitHero(*this);
     refresh();
 }
 
@@ -174,10 +177,15 @@ void Hero::getDamage(unsigned int damage) {
     }
 }
 
+void Hero::lvlUpSpell() {
+    --arenaPoinnt;
+    spell->lvlUp();
+}
+
 bool Hero::alive() {
     if (hp > 0) {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
@@ -185,10 +193,6 @@ bool Hero::alive() {
 void Hero::getReward(Armor &reward) {
     equipment->addItem(reward);
     this->acceptItems();
-}
-
-Spider::Spider(unsigned int hp) {
-    this->hp = hp;
 }
 
 void Spider::getDamage(unsigned int damage) {
@@ -217,7 +221,15 @@ void Spider::hitHero(Hero &hero) {
     hero.getDamage(damage / hero.getArmor());
 }
 
-void Werewolf::getDamage(unsigned int damage) {
+BossSpider::BossSpider(unsigned int hp) {
+    if (hp < 200) {
+        this->hp = 200;
+    }else{
+        this->hp = hp;
+    }
+}
+
+void BossSpider::getDamage(unsigned int damage) {
     if (hp > damage) {
         hp -= damage;
     } else {
@@ -225,7 +237,7 @@ void Werewolf::getDamage(unsigned int damage) {
     }
 }
 
-bool Werewolf::alive() {
+bool BossSpider::alive() {
     if (hp == 0) {
         return false;
     } else {
@@ -233,11 +245,17 @@ bool Werewolf::alive() {
     }
 }
 
-void Werewolf::hitHero(Hero &hero) {
+void BossSpider::hitHero(Hero &hero) {
     hero.getDamage(damage / hero.getArmor());
 }
 
-Arena::Arena(Hero *hero, Spider *monster, Armor *reward) {
+void BossSpider::info() {
+    std::cout << "---------------------------------------------------\n";
+    std::cout << "Здоровье паука: " << hp << std::endl;
+    std::cout << "---------------------------------------------------\n";
+}
+
+Arena::Arena(Hero *hero, Monster *monster, Armor *reward) {
     this->hero = hero;
     this->monster = monster;
     this->reward = reward;
@@ -254,19 +272,42 @@ void Arena::getReward() {
         std::cout << "---------------------------------------------------\n";
         std::cout << "Убейте мостра, чтобы получить награду!\n";
         std::cout << "---------------------------------------------------\n";
-    } else if (!hero->alive()){
+    } else if (!hero->alive()) {
         std::cout << "---------------------------------------------------\n";
         std::cout << "Ваш герой мертв!\n";
         std::cout << "---------------------------------------------------\n";
-    }else{
+    } else {
         std::cout << "---------------------------------------------------\n";
         std::cout << "Вы получили награду!\n";
         std::cout << "---------------------------------------------------\n";
-        std::cout<<reward->getName()<<std::endl;
-        std::cout<<"Броня: +"<< reward->getPeotection()<<std::endl;
-        std::cout<<"Урон: +"<<reward->getDamage()<<std::endl;
+        std::cout << reward->getName() << std::endl;
+        std::cout << "Броня: +" << reward->getPeotection() << std::endl;
+        std::cout << "Урон: +" << reward->getDamage() << std::endl;
         std::cout << "---------------------------------------------------\n";
+        hero->getArenaPoint();
         hero->getReward(*reward);
     }
+}
+
+InfectedHero::InfectedHero(Hero *infectedHero) {
+    this->infectedHero = infectedHero;
+}
+
+void InfectedHero::getDamage(unsigned int damage) {
+        infectedHero->getDamage(damage);
+}
+
+bool InfectedHero::alive() {
+    infectedHero->alive();
+}
+
+void InfectedHero::hitHero(Hero &hero) {
+    hero.getDamage(infectedHero->getDamage() / hero.getArmor());
+}
+
+void InfectedHero::info() {
+    std::cout << "---------------------------------------------------\n";
+    std::cout << "Здоровье инфецированного героя: " << infectedHero->getHp() << std::endl;
+    std::cout << "---------------------------------------------------\n";
 }
 

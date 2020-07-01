@@ -16,7 +16,9 @@ class Monster;
 
 class Spider;
 
-class Werewolf;
+class BossSpider;
+
+class InfectedHero;
 
 
 class Armor {
@@ -59,11 +61,6 @@ private:
     unsigned int damage = 30;
     unsigned int manaCost = 50;
 public:
-    std::string getName();
-
-    unsigned int getLvl();
-
-    unsigned int getDamage();
 
     unsigned int getManaCost();
 
@@ -83,6 +80,7 @@ private:
     unsigned int mana = 100;
     unsigned int damage = 20;
     unsigned int protection = 3;
+    unsigned int arenaPoinnt = 0;
     Equipment *equipment;
     Spell *spell;
 
@@ -94,6 +92,10 @@ public:
 
     unsigned int getArmor();
 
+    unsigned int getHp();
+
+    unsigned int getDamage();
+
     void getReward(Armor &reward);
 
     void acceptItems();
@@ -104,11 +106,15 @@ public:
 
     void infoSpell();
 
-    void castSpell(Spider &monster);
+    void castSpell(Monster *monster);
 
-    void hit(Spider &monster);
+    void hit(Monster *monster);
 
     void getDamage(unsigned int damage);
+
+    void getArenaPoint();
+
+    void lvlUpSpell();
 
     bool alive();
 };
@@ -124,14 +130,13 @@ public:
     virtual void info() = 0;
 };
 
-class Spider : Monster {
+class Spider : public Monster {
 private:
-    unsigned int hp;
+    unsigned int hp = 100;
     unsigned int damage = 10;
 public:
-    Spider(unsigned int hp);
 
-    void info();
+    void info() override;
 
     void hitHero(Hero &hero) override;
 
@@ -140,27 +145,48 @@ public:
     bool alive() override;
 };
 
-class Werewolf : Monster {
+class BossSpider : public Spider {
 private:
-    unsigned int hp;
-    unsigned int damage;
+    unsigned int hp = 200;
+    unsigned int damage = 30;
 public:
+    BossSpider(unsigned int hp);
+
+    void info() override;
+
     void hitHero(Hero &hero) override;
 
     void getDamage(unsigned int damage) override;
 
     bool alive() override;
 };
+
+class InfectedHero : public Monster{   //Adapter
+private:
+    Hero *infectedHero;
+public:
+    InfectedHero(Hero *infectedHero);
+
+    void info() override;
+
+    void hitHero(Hero &hero) override;
+
+    void getDamage(unsigned int damage) override;
+
+    bool alive() override;
+};
+
 
 class Arena {
 private:
     Hero *hero;
-    Spider *monster;
+    Monster *monster;
     Armor *reward;
 public:
-    Arena(Hero *hero, Spider *monster, Armor *reward);
+    Arena(Hero *hero, Monster *monster, Armor *reward);
 
     void info();
 
     void getReward();
 };
+
